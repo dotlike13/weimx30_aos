@@ -1,0 +1,85 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    compileSdk 32
+
+    defaultConfig {
+        minSdk 23
+        targetSdk 32
+        versionCode 1
+        versionName "0.0.1"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+
+
+    flavorDimensions 'WalletSDK'
+    productFlavors {
+        dev {
+            dimension = 'WalletSDK'
+            buildConfigField "String", "A2A_SERVER_DOMAIN", "\"wma2a.metadium.com\""
+        }
+        prod {
+            dimension = 'WalletSDK'
+            buildConfigField "String", "A2A_SERVER_DOMAIN", "\"wma2a.metadium.com\""
+        }
+
+
+    }
+
+    sourceSets {
+        dev {
+            res.srcDirs = ['src/dev/res']
+        }
+
+        prod {
+            res.srcDirs = ['src/prod/res']
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+    }
+/*
+    libraryVariants.all { variant ->
+        variant.outputs.all {
+            def appName = "WemixWalletSDK"
+            def variantName = variant.productFlavors[0].name
+            def date = new Date()
+            def formattedDate = date.format('yyMMddHHmm')
+            def newName
+            newName = "${appName}_${defaultConfig.versionName}_${defaultConfig.versionCode}_${formattedDate}"
+            if (variantName == "dev") {
+                newName = "${newName}_dev"
+            }
+            else {
+                newName = "${newName}"
+            }
+            outputFileName = newName
+        }
+    }
+
+ */
+
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.6.0'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+    implementation 'com.google.code.gson:gson:2.8.7'//gson
+}
