@@ -224,9 +224,9 @@ public class WemixWalletSDK{
                         Logger.debug("requestProposalA2A  requestId  : " + response.getRequestId());
                         // check install or enable
                         if(checkInstall()){
-                            resultHandler.onResult(status, response.getRequestId());
+//                            resultHandler.onResult(status, response.getRequestId());
                             // Wemixwallet 앱 호출
-//                            new Handler(Looper.getMainLooper()).post(() -> launch(response.getRequestId()));
+                            new Handler(Looper.getMainLooper()).post(() -> launch(response.getRequestId()));
                         }else{
                             // play store link.
                             resultHandler.onNotInstall(getIntent(RequestSchemeCreator.create(activityWrapper, response.getRequestId())));
@@ -298,8 +298,8 @@ public class WemixWalletSDK{
                         // check install or enable
                         if(checkInstall()){
                             // Wemixwallet 앱 호출
-                            resultHandler.onResult(status, response.getRequestId());
-//                            new Handler(Looper.getMainLooper()).post(() -> launch(response.getRequestId()));
+//                            resultHandler.onResult(status, response.getRequestId());
+                            new Handler(Looper.getMainLooper()).post(() -> launch(response.getRequestId()));
                         }else{
                             // play store link.
                             resultHandler.onNotInstall(getIntent(RequestSchemeCreator.create(activityWrapper, response.getRequestId())));
