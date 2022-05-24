@@ -280,16 +280,7 @@ public class WemixWalletSDK{
 
                 final A2AResponse response = gson.fromJson(stringBody, A2AResponse.class);
                 if(response.isSuccess()){
-
-                    // check install or enable
-                    if(checkInstall()){
-                        // Wemixwallet 앱 호출
-//                            resultHandler.onResult(status, response.getRequestId());
-                        new Handler(Looper.getMainLooper()).post(() -> launch(response.getRequestId()));
-                    }else{
-                        // play store link.
-                        resultHandler.onNotInstall(getIntent(RequestSchemeCreator.create(activityWrapper, response.getRequestId())));
-                    }
+                    resultHandler.onResult(REQUEST_CODE_RESULT, response.getRequestId(),response);
                 }else{
                     // 요청 실패
                     onRequestFailed(status);
@@ -355,9 +346,13 @@ public class WemixWalletSDK{
      */
     public boolean handleResult(int requestCode, int resultCode, Intent data){
         if(requestCode == REQUEST_CODE_SIGN){
-            Logger.debug("Response from Wemixwallet : resultCode=" + resultCode);
-            String requestId = data.getStringExtra(REQUEST_ID);
-            resultHandler.onResult(resultCode, requestId, null);
+            if(resultCode == Activity.RESULT_OK){
+                Logger.debug("Response from Wemixwallet : resultCode=" + resultCode);
+                String requestId = data.getStringExtra(REQUEST_ID);
+                resultHandler.onResult(resultCode, requestId, null);
+            }else if(resultCode == Activity.RESULT_CANCELED){
+                resultHandler.onResult(resultCode, null, null);
+            }
             return true;
         }
         return false;

@@ -23,6 +23,9 @@ import com.coinplug.wemixwallet.sdk.data.SendNFT;
 import com.coinplug.wemixwallet.sdk.data.SendToken;
 import com.coinplug.wemixwallet.sdk.data.SendWemix;
 import com.coinplug.wemixwalletsdk.databinding.ActivityMainBinding;
+import com.google.gson.Gson;
+
+import java.lang.reflect.GenericSignatureFormatError;
 
 
 public class MainActivity extends AppCompatActivity{
@@ -54,6 +57,9 @@ public class MainActivity extends AppCompatActivity{
                 requestID = requestId;
             }else if(resultCode ==  REQUEST_CODE_RESULT){
                 Log.e(TAG,"resultCode = "+  response.getStatus());
+                Gson gson = new Gson();
+                String res = gson.toJson(response);
+                Log.e(TAG,"response = "+res);
             }else if(resultCode == Activity.RESULT_CANCELED){
                 Log.e(TAG,"CANCEL");
             }
