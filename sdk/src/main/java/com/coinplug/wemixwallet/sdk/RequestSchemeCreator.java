@@ -1,5 +1,7 @@
 package com.coinplug.wemixwallet.sdk;
 
+import static com.coinplug.wemixwallet.sdk.WemixWalletSDK.REQUEST_ID;
+
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
@@ -9,7 +11,7 @@ public class RequestSchemeCreator{
         // Create scheme
         Uri.Builder appSchemebuilder = new Uri.Builder().scheme("wemix")
                 .authority("wallet")
-                .appendQueryParameter("requestId", requestId);
+                .appendQueryParameter(REQUEST_ID, requestId);
 
         return appSchemebuilder.build();
     }

@@ -21,9 +21,6 @@ import com.coinplug.wemixwallet.sdk.data.SendWemix;
 import com.coinplug.wemixwallet.util.Logger;
 import com.google.gson.Gson;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,8 +31,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-
-import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Wemixwallet 앱과 연동하는 SDK
@@ -48,7 +43,9 @@ public class WemixWalletSDK{
     private static final String WEMIXWALLET_PACKAGE_NAME = "com.coinplug.wemixwallet";
 
     private static final int REQUEST_CODE_SIGN = 1001;
-
+    public static final int REQUEST_CODE_PROPOSAL = 1002;
+    public static final int REQUEST_CODE_RESULT = 1003;
+    public static final String REQUEST_ID = "requestId";
     private static final String LOG_TAG = WemixWalletSDK.class.getSimpleName();
 
     private enum RequestType{
@@ -144,7 +141,7 @@ public class WemixWalletSDK{
      * @param sendWemix transaction data
      */
     public void sendWemix(@NonNull Metadata metadata, SendWemix sendWemix){
-        A2AProposalRequest requestData = new A2AProposalRequest(metadata,RequestType.send.name(),sendWemix.getTransactionData());
+        A2AProposalRequest requestData = new A2AProposalRequest(metadata, RequestType.send.name(), sendWemix.getTransactionData());
         requestProposalA2A(requestData);
     }
 
@@ -153,16 +150,16 @@ public class WemixWalletSDK{
      * @param sendToken transaction data
      */
     public void sendToken(@NonNull Metadata metadata, SendToken sendToken){
-        A2AProposalRequest requestData = new A2AProposalRequest(metadata,RequestType.send_token.name(),sendToken.getTransactionData());
+        A2AProposalRequest requestData = new A2AProposalRequest(metadata, RequestType.send_token.name(), sendToken.getTransactionData());
         requestProposalA2A(requestData);
     }
 
     /**
      * @param metadata 요청 app data
-     * @param sendNFT transaction data
+     * @param sendNFT  transaction data
      */
     public void sendNFT(@NonNull Metadata metadata, SendNFT sendNFT){
-        A2AProposalRequest requestData = new A2AProposalRequest(metadata,RequestType.send_nft.name(),sendNFT.getTransactionData());
+        A2AProposalRequest requestData = new A2AProposalRequest(metadata, RequestType.send_nft.name(), sendNFT.getTransactionData());
         requestProposalA2A(requestData);
     }
 
@@ -171,7 +168,7 @@ public class WemixWalletSDK{
      * @param executeContract transaction data
      */
     public void executeContract(@NonNull Metadata metadata, ExecuteContract executeContract){
-        A2AProposalRequest requestData = new A2AProposalRequest(metadata,RequestType.contract_execute.name(),executeContract.getTransactionData());
+        A2AProposalRequest requestData = new A2AProposalRequest(metadata, RequestType.contract_execute.name(), executeContract.getTransactionData());
         requestProposalA2A(requestData);
     }
 
@@ -207,45 +204,36 @@ public class WemixWalletSDK{
                     is = conn.getErrorStream();
                 }
 
-                try{
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    byte[] buffer = new byte[1024];
-                    int len;
-                    while((len = is.read(buffer, 0, buffer.length)) != -1){
-                        baos.write(buffer, 0, len);
-                    }
-                    String stringBody = new String(baos.toByteArray(), StandardCharsets.UTF_8);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int len;
+                while((len = is.read(buffer, 0, buffer.length)) != -1){
+                    baos.write(buffer, 0, len);
+                }
+                String stringBody = new String(baos.toByteArray(), StandardCharsets.UTF_8);
 
-                    Logger.debug("requestProposalA2A  response body : " + stringBody);
-
-                    JSONObject jsonObject = new JSONObject(stringBody);
-                    final A2AProposalResponse response = A2AProposalResponse.fromJSONObect(jsonObject);
-                    if(response.isSuccess()){
-                        Logger.debug("requestProposalA2A  requestId  : " + response.getRequestId());
-                        // check install or enable
-                        if(checkInstall()){
-//                            resultHandler.onResult(status, response.getRequestId());
-                            // Wemixwallet 앱 호출
-                            new Handler(Looper.getMainLooper()).post(() -> launch(response.getRequestId()));
-                        }else{
-                            // play store link.
-                            resultHandler.onNotInstall(getIntent(RequestSchemeCreator.create(activityWrapper, response.getRequestId())));
-                        }
+                Logger.debug("requestProposalA2A  response body : " + stringBody);
+                final A2AResponse response = gson.fromJson(stringBody, A2AResponse.class);
+                if(response.isSuccess()){
+                    Logger.debug("requestProposalA2A  requestId  : " + response.getRequestId());
+                    // check install or enable
+                    if(checkInstall()){
+                        // Wemixwallet 앱 호출
+                        new Handler(Looper.getMainLooper()).post(() -> launch(response.getRequestId()));
                     }else{
-                        // 요청 실패
-                        Logger.debug("요청 실패" );
-                        onRequestFailed(status);
+                        // play store link.
+                        resultHandler.onNotInstall(getIntent(RequestSchemeCreator.create(activityWrapper, response.getRequestId())));
                     }
-                }catch(JSONException e){
-                    Logger.debug("JSONException" );
-                    // 서버에서 준 응답을 파싱 못합. 서버 또는 네트워크 에러 경우
+                }else{
+                    // 요청 실패
+                    Logger.debug("요청 실패");
                     onRequestFailed(status);
                 }
             }catch(MalformedURLException e){
                 // Never happened
-                Logger.debug("IOException" );
+                Logger.debug("IOException");
             }catch(IOException e){
-                Logger.debug("IOException" );
+                Logger.debug("IOException");
                 onRequestFailed(-1);
             }
         }).start();
@@ -255,7 +243,7 @@ public class WemixWalletSDK{
         getProposalResponseA2A(requestId);
     }
 
-    private void getProposalResponseA2A( String requestId){
+    private void getProposalResponseA2A(String requestId){
         // make launch url
         final Uri.Builder builder = Uri.parse("http://" + BuildConfig.A2A_SERVER_DOMAIN + "/api/v1/a2a/result").buildUpon()
                 .appendQueryParameter("requestId", requestId);
@@ -267,7 +255,7 @@ public class WemixWalletSDK{
                 URL url = new URL(builder.build().toString());
 
                 // launch from auth server
-                HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("Content-Type", "application/json; utf-8");
 
@@ -280,36 +268,30 @@ public class WemixWalletSDK{
                     is = conn.getErrorStream();
                 }
 
-                try{
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    byte[] buffer = new byte[1024];
-                    int len;
-                    while((len = is.read(buffer, 0, buffer.length)) != -1){
-                        baos.write(buffer, 0, len);
-                    }
-                    String stringBody = new String(baos.toByteArray(), StandardCharsets.UTF_8);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int len;
+                while((len = is.read(buffer, 0, buffer.length)) != -1){
+                    baos.write(buffer, 0, len);
+                }
+                String stringBody = new String(baos.toByteArray(), StandardCharsets.UTF_8);
 
-                    Logger.debug("requestProposalA2A init response body : " + stringBody);
+                Logger.debug("requestProposalA2A init response body : " + stringBody);
 
-                    JSONObject jsonObject = new JSONObject(stringBody);
-                    final A2AProposalResponse response = A2AProposalResponse.fromJSONObect(jsonObject);
-                    if(response.isSuccess()){
+                final A2AResponse response = gson.fromJson(stringBody, A2AResponse.class);
+                if(response.isSuccess()){
 
-                        // check install or enable
-                        if(checkInstall()){
-                            // Wemixwallet 앱 호출
+                    // check install or enable
+                    if(checkInstall()){
+                        // Wemixwallet 앱 호출
 //                            resultHandler.onResult(status, response.getRequestId());
-                            new Handler(Looper.getMainLooper()).post(() -> launch(response.getRequestId()));
-                        }else{
-                            // play store link.
-                            resultHandler.onNotInstall(getIntent(RequestSchemeCreator.create(activityWrapper, response.getRequestId())));
-                        }
+                        new Handler(Looper.getMainLooper()).post(() -> launch(response.getRequestId()));
                     }else{
-                        // 요청 실패
-                        onRequestFailed(status);
+                        // play store link.
+                        resultHandler.onNotInstall(getIntent(RequestSchemeCreator.create(activityWrapper, response.getRequestId())));
                     }
-                }catch(JSONException e){
-                    // 서버에서 준 응답을 파싱 못합. 서버 또는 네트워크 에러 경우
+                }else{
+                    // 요청 실패
                     onRequestFailed(status);
                 }
             }catch(MalformedURLException e){
@@ -319,7 +301,6 @@ public class WemixWalletSDK{
             }
         }).start();
     }
-
 
 
     /**
@@ -336,6 +317,7 @@ public class WemixWalletSDK{
 
     /**
      * Wemixwallet 앱을 인증 요청
+     *
      * @param requestId a2a response 의 requestId
      */
     private void launch(String requestId){
@@ -374,17 +356,8 @@ public class WemixWalletSDK{
     public boolean handleResult(int requestCode, int resultCode, Intent data){
         if(requestCode == REQUEST_CODE_SIGN){
             Logger.debug("Response from Wemixwallet : resultCode=" + resultCode);
-            if(data != null){
-                String typeStr = data.getStringExtra("type");
-                int type = -1;
-                if(typeStr != null){
-                    type = Integer.parseInt(typeStr);
-                }
-                resultHandler.onResult(resultCode, data.getStringExtra("state"));
-            }else{
-                Logger.error("Data of response from Wemixwallet is null");
-                resultHandler.onResult(resultCode, null);
-            }
+            String requestId = data.getStringExtra(REQUEST_ID);
+            resultHandler.onResult(resultCode, requestId, null);
             return true;
         }
         return false;

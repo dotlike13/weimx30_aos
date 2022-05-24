@@ -24,7 +24,7 @@ public interface ResultHandler{
      * @param resultCode 결과 코드. 성공: {@link android.app.Activity#RESULT_OK}, 사용자취소: {@link android.app.Activity#RESULT_CANCELED}, 파라미터오류: 4,
      * @param requestId  requestId
      */
-    void onResult(int resultCode, String requestId);
+    void onResult(int resultCode, String requestId, A2AResponse response);
 
     /**
      * Wemixwallet 이 설치 되어 있지 않는 경우 호출
