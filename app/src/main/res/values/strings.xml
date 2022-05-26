@@ -13,4 +13,7 @@
     <string name="tokenId">tokenId</string>
     <string name="abi">abi</string>
     <string name="params">params</string>
+    <string name="status">status :</string>
+    <string name="address">address :</string>
+    <string name="txhash">txhash :</string>
 </resources>

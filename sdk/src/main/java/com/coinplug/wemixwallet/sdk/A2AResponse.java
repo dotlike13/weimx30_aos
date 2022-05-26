@@ -43,6 +43,9 @@ public class A2AResponse{
         return expirationTime;
     }
 
+    public ResultData getResult(){
+        return result;
+    }
 
     /**
      * 초기화 성공 여부
@@ -50,7 +53,11 @@ public class A2AResponse{
      * @return 초기화 됐으면 <code>true</code> 반환
      */
     boolean isSuccess(){
-        return status.equals(ResponseStatus.proposal.toString());
+        boolean statusResult = false;
+        if(status.equals(ResponseStatus.proposal.toString()) || status.equals(ResponseStatus.completed.toString()) ){
+            statusResult = true;
+        }
+        return statusResult;
     }
 
 

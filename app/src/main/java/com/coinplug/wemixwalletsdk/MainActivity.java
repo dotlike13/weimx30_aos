@@ -25,8 +25,6 @@ import com.coinplug.wemixwallet.sdk.data.SendWemix;
 import com.coinplug.wemixwalletsdk.databinding.ActivityMainBinding;
 import com.google.gson.Gson;
 
-import java.lang.reflect.GenericSignatureFormatError;
-
 
 public class MainActivity extends AppCompatActivity{
 
@@ -35,6 +33,7 @@ public class MainActivity extends AppCompatActivity{
     private ActivityMainBinding binding = null;
     private Metadata metadata = null;
     private String requestID = null;
+    private String myAddress = null;
     private final ResultHandler resultHandler = new ResultHandler(){
         @Override
         public void onAuthInitFailed(int statusCode){
@@ -47,9 +46,16 @@ public class MainActivity extends AppCompatActivity{
         }
 
 
+        /**
+         * sdk 에서 받은 응답 처러
+         * @param resultCode 결과 코드. 성공: {@link android.app.Activity#RESULT_OK}, 사용자취소: {@link android.app.Activity#RESULT_CANCELED}, 파라미터오류: 4,
+         * @param requestId  requestId
+         * @param response A2AResponse A2A서버에서 받는 응답
+         */
+        @SuppressLint("SetTextI18n")
         @Override
         public void onResult(int resultCode, String requestId, A2AResponse response){
-            Toast.makeText(MainActivity.this, "requestId=" + requestId + " resultCode=" + resultCode, Toast.LENGTH_SHORT).show();
+            runOnUiThread(() -> Toast.makeText(MainActivity.this, "requestId=" + requestId + " resultCode=" + resultCode, Toast.LENGTH_SHORT).show());
             Log.e(TAG,"resultCode = "+resultCode);
             if(resultCode == Activity.RESULT_OK){
                 walletSdk.getResult(requestId);
@@ -59,6 +65,17 @@ public class MainActivity extends AppCompatActivity{
                 Log.e(TAG,"resultCode = "+  response.getStatus());
                 Gson gson = new Gson();
                 String res = gson.toJson(response);
+                String address = response.getResult().getAddress();
+                runOnUiThread(() ->{
+                    binding.status.setText(response.getStatus());
+                    binding.myAddress.setText(address);
+                    myAddress = address;
+                    if(response.getResult().getAddress() != null){
+                        binding.data.setText(getString(R.string.address)+response.getResult().getAddress());
+                    }else{
+                        binding.data.setText(getString(R.string.txhash)+response.getResult().getTransactionHash());
+                    }
+                });
                 Log.e(TAG,"response = "+res);
             }else if(resultCode == Activity.RESULT_CANCELED){
                 Log.e(TAG,"CANCEL");
@@ -95,6 +112,9 @@ public class MainActivity extends AppCompatActivity{
         binding.value1.setVisibility(View.GONE);
         binding.value2.setVisibility(View.GONE);
         binding.radioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
+            if(i !=  R.id.radio1){
+                binding.myAddress.setText(myAddress);
+            }
             switch(i){
                 case R.id.radio1:
                     binding.myAddress.setVisibility(View.GONE);
