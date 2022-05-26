@@ -1,5 +1,7 @@
 package com.coinplug.wemixwallet.sdk.data;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -9,7 +11,7 @@ public class SendToken extends SendData{
     @SerializedName("contract")
     private String contract;
 
-    public SendToken(String from, String to, String value, String contract){
+    public SendToken(@NonNull String from, @NonNull String to, @NonNull String value, @NonNull String contract){
         super(from, to);
         this.value = value;
         this.contract = contract;
