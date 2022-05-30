@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity{
     private WemixWalletSDK walletSdk = null;
     private ActivityMainBinding binding = null;
     private Metadata metadata = null;
-    private String requestID = null;
+    private String requestIDResult = null;
     private String myAddress = null;
     private final ResultHandler resultHandler = new ResultHandler(){
         @Override
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity{
             if(resultCode == Activity.RESULT_OK){
                 walletSdk.getResult(requestId);
             }else if(resultCode == REQUEST_CODE_PROPOSAL){
-                requestID = requestId;
+                requestIDResult = requestId;
             }else if(resultCode ==  REQUEST_CODE_RESULT){
                 Log.e(TAG,"resultCode = "+  response.getStatus());
                 Gson gson = new Gson();
@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity{
                     }
                 });
                 Log.e(TAG,"response = "+res);
+                requestIDResult = response.getRequestId();
             }else if(resultCode == Activity.RESULT_CANCELED){
                 Log.e(TAG,"CANCEL");
             }
@@ -210,6 +211,13 @@ public class MainActivity extends AppCompatActivity{
 
         });
 
-        binding.resultBtn.setOnClickListener(view -> walletSdk.getResult(requestID));
+        binding.resultBtn.setOnClickListener(view -> {
+            Log.e(TAG,"resultCode = "+requestIDResult);
+            if(requestIDResult == null){
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "먼저 요청을 하세요", Toast.LENGTH_SHORT).show());
+            }else{
+                walletSdk.getResult(requestIDResult);
+            }
+        });
     }
 }
