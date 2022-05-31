@@ -116,12 +116,16 @@ public class MainActivity extends AppCompatActivity{
             if(i !=  R.id.radio1){
                 binding.myAddress.setText(myAddress);
             }
+            binding.status.setText(getString(R.string.status));
+
             switch(i){
                 case R.id.radio1:
                     binding.myAddress.setVisibility(View.GONE);
                     binding.toAddress.setVisibility(View.GONE);
                     binding.value1.setVisibility(View.GONE);
                     binding.value2.setVisibility(View.GONE);
+                    binding.data.setText(getString(R.string.address));
+                    binding.requestBtn.setText(R.string.auth);
                     break;
                 case R.id.radio2:
                     binding.myAddress.setVisibility(View.VISIBLE);
@@ -129,6 +133,8 @@ public class MainActivity extends AppCompatActivity{
                     binding.value1.setVisibility(View.VISIBLE);
                     binding.value1.setHint(R.string.value);
                     binding.value2.setVisibility(View.GONE);
+                    binding.data.setText(getString(R.string.txhash));
+                    binding.requestBtn.setText(R.string.send);
                     break;
                 case R.id.radio3:
                     binding.myAddress.setVisibility(View.VISIBLE);
@@ -137,6 +143,8 @@ public class MainActivity extends AppCompatActivity{
                     binding.value1.setHint(R.string.value);
                     binding.value2.setVisibility(View.VISIBLE);
                     binding.value2.setHint(R.string.contract);
+                    binding.data.setText(getString(R.string.txhash));
+                    binding.requestBtn.setText(R.string.sendToken);
 
                     break;
                 case R.id.radio4:
@@ -146,7 +154,8 @@ public class MainActivity extends AppCompatActivity{
                     binding.value1.setHint(R.string.contract);
                     binding.value2.setVisibility(View.VISIBLE);
                     binding.value2.setHint(R.string.tokenId);
-
+                    binding.data.setText(getString(R.string.txhash));
+                    binding.requestBtn.setText(R.string.sendNFT);
                     break;
                 case R.id.radio5:
                     binding.myAddress.setVisibility(View.VISIBLE);
@@ -155,6 +164,8 @@ public class MainActivity extends AppCompatActivity{
                     binding.value1.setHint(R.string.abi);
                     binding.value2.setVisibility(View.VISIBLE);
                     binding.value2.setHint(R.string.params);
+                    binding.data.setText(getString(R.string.txhash));
+                    binding.requestBtn.setText(R.string.contractExecute);
                     break;
                 default:
                     break;
@@ -211,13 +222,13 @@ public class MainActivity extends AppCompatActivity{
 
         });
 
-        binding.resultBtn.setOnClickListener(view -> {
-            Log.e(TAG,"resultCode = "+requestIDResult);
-            if(requestIDResult == null){
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "먼저 요청을 하세요", Toast.LENGTH_SHORT).show());
-            }else{
-                walletSdk.getResult(requestIDResult);
-            }
-        });
+//        binding.resultBtn.setOnClickListener(view -> {
+//            Log.e(TAG,"resultCode = "+requestIDResult);
+//            if(requestIDResult == null){
+//                runOnUiThread(() -> Toast.makeText(MainActivity.this, "먼저 요청을 하세요", Toast.LENGTH_SHORT).show());
+//            }else{
+//                walletSdk.getResult(requestIDResult);
+//            }
+//        });
     }
 }

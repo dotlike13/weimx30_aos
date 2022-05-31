@@ -55,6 +55,7 @@
             android:layout_height="wrap_content"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
+            android:hint="@string/from"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
@@ -122,12 +123,13 @@
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="20dp"
-            android:text="@string/request"
+            android:text="@string/auth"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/resultBtn"
             app:layout_constraintStart_toStartOf="parent" />
 
         <Button
+            android:visibility="gone"
             android:id="@+id/resultBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
