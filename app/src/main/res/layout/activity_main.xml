@@ -55,6 +55,7 @@
             android:layout_height="wrap_content"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
+            android:hint="@string/from"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/radioGroup" />

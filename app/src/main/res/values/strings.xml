@@ -5,6 +5,7 @@
     <string name="sendToken">토큰전송</string>
     <string name="sendNFT">NFT전송</string>
     <string name="contractExecute">컨트랙실행</string>
+    <string name="from">from</string>
     <string name="to">to</string>
     <string name="request">요청</string>
     <string name="result">결과확인</string>
