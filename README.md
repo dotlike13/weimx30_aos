@@ -123,7 +123,7 @@ NFT 보내기를 요청합니다.
 AndroidManifest.xml 파일에 호출하는 앱 package명를 추가해야 합니다.
 ```xml
     <queries>
-        <package android:name="com.coinplug.wemixwallet" />
+        <package android:name="com.wemixfoundation.wemixwallet" />
     </queries>
  ```
 

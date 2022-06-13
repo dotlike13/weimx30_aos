@@ -3,7 +3,7 @@
     package="com.coinplug.wemixwalletsdk">
     <uses-permission android:name="android.permission.INTERNET" />
     <queries>
-        <package android:name="com.coinplug.wemixwallet" />
+        <package android:name="com.wemixfoundation.wemixwallet" />
     </queries>
     <application
         android:allowBackup="true"
