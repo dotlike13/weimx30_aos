@@ -40,7 +40,7 @@ import java.nio.charset.StandardCharsets;
  */
 @SuppressWarnings("unused")
 public class WemixWalletSDK{
-    private static final String WEMIXWALLET_PACKAGE_NAME = "com.coinplug.wemixwallet";
+    private static final String WEMIXWALLET_PACKAGE_NAME = "com.wemixfoundation.wemixwallet";
 
     private static final int REQUEST_CODE_SIGN = 1001;
     public static final int REQUEST_CODE_PROPOSAL = 1002;
