@@ -1,8 +1,5 @@
 package com.coinplug.wemixwalletsdk;
 
-import static com.coinplug.wemixwallet.sdk.WemixWalletSDK.REQUEST_CODE_PROPOSAL;
-import static com.coinplug.wemixwallet.sdk.WemixWalletSDK.REQUEST_CODE_RESULT;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -15,7 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.coinplug.wemixwallet.sdk.A2AResponse;
-import com.coinplug.wemixwallet.sdk.ResultHandler;
+import com.coinplug.wemixwallet.sdk.ProposalResultHandler;
+import com.coinplug.wemixwallet.sdk.ResponseResultHandler;
 import com.coinplug.wemixwallet.sdk.WemixWalletSDK;
 import com.coinplug.wemixwallet.sdk.data.ExecuteContract;
 import com.coinplug.wemixwallet.sdk.data.Metadata;
@@ -32,61 +30,62 @@ public class MainActivity extends AppCompatActivity{
     private WemixWalletSDK walletSdk = null;
     private ActivityMainBinding binding = null;
     private Metadata metadata = null;
-    private String requestIDResult = null;
     private String myAddress = null;
-    private final ResultHandler resultHandler = new ResultHandler(){
+    //작업 요청 결과 확인
+    private final ProposalResultHandler resultHandler = new ProposalResultHandler(){
         @Override
         public void onAuthInitFailed(int statusCode){
-
+            //네트워크 에러 처리
         }
 
         @Override
         public void onNotInstall(final Intent intent){
+            //앱 미설치 에러 처리
             runOnUiThread(() -> Toast.makeText(MainActivity.this, "Not install WemixWallet", Toast.LENGTH_SHORT).show());
         }
 
-
-        /**
-         * sdk 에서 받은 응답 처러
-         * @param resultCode 결과 코드. 성공: {@link android.app.Activity#RESULT_OK}, 사용자취소: {@link android.app.Activity#RESULT_CANCELED}, 파라미터오류: 4,
-         * @param requestId  requestId
-         * @param response A2AResponse A2A서버에서 받는 응답
-         */
-        @SuppressLint("SetTextI18n")
+        //작업요청 응답
         @Override
-        public void onResult(int resultCode, String requestId, A2AResponse response){
-            runOnUiThread(() -> Toast.makeText(MainActivity.this, "requestId=" + requestId + " resultCode=" + resultCode, Toast.LENGTH_SHORT).show());
-            Log.e(TAG,"resultCode = "+resultCode);
+        public void onProposalResult(int resultCode, String requestId){
+            Log.e(TAG, "onAuthResult = " + requestId);
             if(resultCode == Activity.RESULT_OK){
-                walletSdk.getResult(requestId);
-            }else if(resultCode == REQUEST_CODE_PROPOSAL){
-                requestIDResult = requestId;
-            }else if(resultCode ==  REQUEST_CODE_RESULT){
-                Log.e(TAG,"resultCode = "+  response.getStatus());
-                Gson gson = new Gson();
-                String res = gson.toJson(response);
-                String address = response.getResult().getAddress();
-                runOnUiThread(() ->{
-                    binding.status.setText(response.getStatus());
-                    binding.myAddress.setText(address);
-                    myAddress = address;
-                    if(response.getResult().getAddress() != null){
-                        binding.data.setText(getString(R.string.address)+response.getResult().getAddress());
-                    }else{
-                        binding.data.setText(getString(R.string.txhash)+response.getResult().getTransactionHash());
-                    }
-                });
-                Log.e(TAG,"response = "+res);
-                requestIDResult = response.getRequestId();
+                walletSdk.getResult(requestId, responseResultHandler);
             }else if(resultCode == Activity.RESULT_CANCELED){
-                Log.e(TAG,"CANCEL");
+                Log.e(TAG, "CANCEL");
             }
+        }
+    };
+
+    //작업 요청 시행 결과 확인
+    private final ResponseResultHandler responseResultHandler = new ResponseResultHandler(){
+        @Override
+        public void onResult(String requestId, A2AResponse response){
+            Log.e(TAG, "resultCode = " + response.getStatus());
+            Gson gson = new Gson();
+            String res = gson.toJson(response);
+            String address = null;
+            if(response.getResult().getAddress() != null){
+                myAddress = response.getResult().getAddress();
+                runOnUiThread(() -> {
+                    binding.myAddress.setText(myAddress);
+                });
+            }
+            runOnUiThread(() -> {
+                binding.status.setText(response.getStatus());
+                if(response.getResult().getAddress() != null){
+                    binding.data.setText(getString(R.string.address) + response.getResult().getAddress());
+                }else{
+                    binding.data.setText(getString(R.string.txhash) + response.getResult().getTransactionHash());
+                }
+            });
+            Log.e(TAG, "response = " + res);
         }
     };
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data){
-        if (walletSdk.handleResult(requestCode, resultCode, data)) {
+        Log.e(TAG, "onActivityResult");
+        if(walletSdk.handleResult(requestCode, resultCode, data)){
             return;
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -106,14 +105,14 @@ public class MainActivity extends AppCompatActivity{
 
     @SuppressLint("NonConstantResourceId")
     private void initUI(){
-        Log.e(TAG,"initUI ");
+        Log.e(TAG, "initUI ");
         binding.radioGroup.check(R.id.radio1);
         binding.myAddress.setVisibility(View.GONE);
         binding.toAddress.setVisibility(View.GONE);
         binding.value1.setVisibility(View.GONE);
         binding.value2.setVisibility(View.GONE);
         binding.radioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
-            if(i !=  R.id.radio1){
+            if(i != R.id.radio1){
                 binding.myAddress.setText(myAddress);
             }
             binding.status.setText(getString(R.string.status));
@@ -183,7 +182,7 @@ public class MainActivity extends AppCompatActivity{
             value1 = binding.value1.getText().toString();
             value2 = binding.value2.getText().toString();
             if(from.equals("")){
-               from = "0x8D433bf803209977e54b07F3ED54f80EA38AeaE0";
+                from = "0x8D433bf803209977e54b07F3ED54f80EA38AeaE0";
             }
             if(to.equals("")){
                 to = "0xcad9042Cf49684939A2F42c2d916d1B6526635c2";
@@ -197,23 +196,23 @@ public class MainActivity extends AppCompatActivity{
             int i = binding.radioGroup.getCheckedRadioButtonId();
             switch(i){
                 case R.id.radio1:
-                    walletSdk.auth(metadata);
+                    walletSdk.proposal(metadata, null);
                     break;
                 case R.id.radio2:
                     SendWemix sendWemix = new SendWemix(from, to, value1);
-                    walletSdk.sendWemix(metadata, sendWemix);
+                    walletSdk.proposal(metadata, sendWemix);
                     break;
                 case R.id.radio3:
                     SendToken sendToken = new SendToken(from, to, value1, value2);
-                    walletSdk.sendToken(metadata, sendToken);
+                    walletSdk.proposal(metadata, sendToken);
                     break;
                 case R.id.radio4:
                     SendNFT sendNFT = new SendNFT(from, to, value1, value2);
-                    walletSdk.sendNFT(metadata, sendNFT);
+                    walletSdk.proposal(metadata, sendNFT);
                     break;
                 case R.id.radio5:
                     ExecuteContract executeContract = new ExecuteContract(from, to, value1, value2);
-                    walletSdk.executeContract(metadata, executeContract);
+                    walletSdk.proposal(metadata, executeContract);
                     break;
                 default:
                     break;
@@ -222,13 +221,5 @@ public class MainActivity extends AppCompatActivity{
 
         });
 
-//        binding.resultBtn.setOnClickListener(view -> {
-//            Log.e(TAG,"resultCode = "+requestIDResult);
-//            if(requestIDResult == null){
-//                runOnUiThread(() -> Toast.makeText(MainActivity.this, "먼저 요청을 하세요", Toast.LENGTH_SHORT).show());
-//            }else{
-//                walletSdk.getResult(requestIDResult);
-//            }
-//        });
     }
 }

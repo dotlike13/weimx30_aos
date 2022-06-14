@@ -11,10 +11,12 @@ import android.os.Handler;
 import android.os.Looper;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.coinplug.wemixwallet.sdk.data.ExecuteContract;
 import com.coinplug.wemixwallet.sdk.data.Metadata;
+import com.coinplug.wemixwallet.sdk.data.SendData;
 import com.coinplug.wemixwallet.sdk.data.SendNFT;
 import com.coinplug.wemixwallet.sdk.data.SendToken;
 import com.coinplug.wemixwallet.sdk.data.SendWemix;
@@ -43,12 +45,11 @@ public class WemixWalletSDK{
     private static final String WEMIXWALLET_PACKAGE_NAME = "com.wemixfoundation.wemixwallet";
 
     private static final int REQUEST_CODE_SIGN = 1001;
-    public static final int REQUEST_CODE_PROPOSAL = 1002;
     public static final int REQUEST_CODE_RESULT = 1003;
     public static final String REQUEST_ID = "requestId";
     private static final String LOG_TAG = WemixWalletSDK.class.getSimpleName();
 
-    private enum RequestType{
+    public enum RequestType{
         auth,
         send,
         send_token,
@@ -64,7 +65,7 @@ public class WemixWalletSDK{
         Logger.setLoggerLevel(Logger.Level.DEBUG);
     }
 
-    private final ResultHandler resultHandler;
+    private final ProposalResultHandler resultHandler;
 
     private final ActivityWrapper activityWrapper;
 
@@ -74,7 +75,7 @@ public class WemixWalletSDK{
      * @param activity      요청 대상 activity
      * @param resultHandler 결과를 통보 받을 instance
      */
-    public WemixWalletSDK(@NonNull Activity activity, @NonNull ResultHandler resultHandler){
+    public WemixWalletSDK(@NonNull Activity activity, @NonNull ProposalResultHandler resultHandler){
         this(new ActivityWrapper(activity), resultHandler);
     }
 
@@ -84,7 +85,7 @@ public class WemixWalletSDK{
      * @param fragment      요청 대상 fragment
      * @param resultHandler 결과를 받을 instance
      */
-    public WemixWalletSDK(@NonNull Fragment fragment, @NonNull ResultHandler resultHandler){
+    public WemixWalletSDK(@NonNull Fragment fragment, @NonNull ProposalResultHandler resultHandler){
         this(new ActivityWrapper(fragment), resultHandler);
     }
 
@@ -94,7 +95,7 @@ public class WemixWalletSDK{
      * @param activityWrapper activity or fragment
      * @param resultHandler   결과를 받을 instance
      */
-    private WemixWalletSDK(@NonNull ActivityWrapper activityWrapper, @NonNull ResultHandler resultHandler){
+    private WemixWalletSDK(@NonNull ActivityWrapper activityWrapper, @NonNull ProposalResultHandler resultHandler){
         this.resultHandler = resultHandler;
         this.activityWrapper = activityWrapper;
 
@@ -126,6 +127,19 @@ public class WemixWalletSDK{
             return false;
         }
         return true;
+    }
+
+    /**
+     * @param metadata 요청 app data
+     */
+    public void proposal(@NonNull Metadata metadata, @Nullable SendData sendData){
+        A2AProposalRequest requestData;
+        if(sendData == null){
+            requestData = new A2AProposalRequest(metadata, RequestType.auth.toString(), null);
+        }else{
+            requestData = new A2AProposalRequest(metadata, sendData.getRequestType(), sendData.getTransactionData());
+        }
+        requestProposalA2A(requestData);
     }
 
     /**
@@ -239,11 +253,11 @@ public class WemixWalletSDK{
         }).start();
     }
 
-    public void getResult(@NonNull String requestId){
-        getProposalResponseA2A(requestId);
+    public void getResult(@NonNull String requestId ,ResponseResultHandler responseResultHandler){
+        getProposalResponseA2A(requestId, responseResultHandler);
     }
 
-    private void getProposalResponseA2A(String requestId){
+    private void getProposalResponseA2A(String requestId, ResponseResultHandler responseResultHandler){
         // make launch url
         final Uri.Builder builder = Uri.parse("http://" + BuildConfig.A2A_SERVER_DOMAIN + "/api/v1/a2a/result").buildUpon()
                 .appendQueryParameter("requestId", requestId);
@@ -280,7 +294,7 @@ public class WemixWalletSDK{
 
                 final A2AResponse response = gson.fromJson(stringBody, A2AResponse.class);
                 if(response.isSuccess()){
-                    resultHandler.onResult(REQUEST_CODE_RESULT, response.getRequestId(),response);
+                    responseResultHandler.onResult(response.getRequestId(),response);
                 }else{
                     // 요청 실패
                     onRequestFailed(status);
@@ -349,9 +363,9 @@ public class WemixWalletSDK{
             if(resultCode == Activity.RESULT_OK){
                 Logger.debug("Response from Wemixwallet : resultCode=" + resultCode);
                 String requestId = data.getStringExtra(REQUEST_ID);
-                resultHandler.onResult(resultCode, requestId, null);
+                resultHandler.onProposalResult(resultCode, requestId);
             }else if(resultCode == Activity.RESULT_CANCELED){
-                resultHandler.onResult(resultCode, null, null);
+                resultHandler.onProposalResult(resultCode, null);
             }
             return true;
         }

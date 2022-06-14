@@ -2,6 +2,7 @@ package com.coinplug.wemixwallet.sdk.data;
 
 import androidx.annotation.NonNull;
 
+import com.coinplug.wemixwallet.sdk.WemixWalletSDK;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -33,7 +34,13 @@ public class ExecuteContract extends SendData{
         this.params = params;
     }
 
+    @Override
     public TransactionData getTransactionData(){
         return  new TransactionData(getFrom(),getTo(), null, null,null,abi,params);
+    }
+
+    @Override
+    public String getRequestType(){
+        return WemixWalletSDK.RequestType.contract_execute.toString();
     }
 }

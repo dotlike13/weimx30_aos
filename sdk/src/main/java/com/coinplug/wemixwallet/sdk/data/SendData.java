@@ -1,9 +1,8 @@
 package com.coinplug.wemixwallet.sdk.data;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class SendData{
+public abstract class SendData{
     @SerializedName("from")
     private String from;
     @SerializedName("to")
@@ -29,4 +28,7 @@ public class SendData{
     public void setTo(String to) {
         this.to = to;
     }
+
+    public abstract String getRequestType();
+    public abstract TransactionData getTransactionData();
 }
