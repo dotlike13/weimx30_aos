@@ -4,8 +4,8 @@ WemixWallet App으로 Auth(주소 요청), Wemix coin / token 보내기 / NFT �
 ## WorkFlow
 
 ## 사용방법
-* [작업요청 결과 확인](#proposal_result)
-* [결과 확인](#response_result)
+* [작업요청 결과 확인](#proposal-result)
+* [작업실행 결과 확인](#response-result)
 * [주소 요청](#auth)
 * [코인 보내기 요청](#send-wemix)
 * [토큰 보내기 요청](#send-token)
@@ -14,7 +14,8 @@ WemixWallet App으로 Auth(주소 요청), Wemix coin / token 보내기 / NFT �
 
 
 ### Proposal Result
-작업 요청 응답 값을 처리
+
+작업 요청 응답 처리 Handler 생성
 
 ```java
     //작업 요청 결과 확인
@@ -45,7 +46,8 @@ WemixWallet App으로 Auth(주소 요청), Wemix coin / token 보내기 / NFT �
 ```
 
 ### Response Result
-요청 결과 값을 처리
+
+작업실행 결과 값 처리 Handler 생성
 
 ```java
     //작업 실행 결과 확인
@@ -54,7 +56,7 @@ WemixWallet App으로 Auth(주소 요청), Wemix coin / token 보내기 / NFT �
         public void onResult(String requestId, A2AResponse response){
             Log.e(TAG, "resultCode = " + response.getStatus());
             Gson gson = new Gson();
-            //작업 요청 실행 결과값
+            //작업 실행 결과값
             String res = gson.toJson(response);
             Log.e(TAG, "response = " + res);
         }
