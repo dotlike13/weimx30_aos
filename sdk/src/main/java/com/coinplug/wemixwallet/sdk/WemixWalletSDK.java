@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -69,6 +70,8 @@ public class WemixWalletSDK{
 
     private final ActivityWrapper activityWrapper;
 
+    private String serverDomain;
+
     /**
      * SDK constructor for activity
      *
@@ -103,6 +106,11 @@ public class WemixWalletSDK{
         try{
             Context context = activityWrapper.getContext();
             ApplicationInfo applicationInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            if(applicationInfo != null){
+                if(applicationInfo.metaData != null){
+                    serverDomain = applicationInfo.metaData.getString("A2A_SERVER_DOMAIN");
+                }
+            }
         }catch(PackageManager.NameNotFoundException e){
             throw new RuntimeException("Not found Wemixwallet App.");
         }
@@ -190,7 +198,13 @@ public class WemixWalletSDK{
         String body = gson.toJson(requestData);
         Logger.debug("requestProposalA2A body : " + body);
         // make launch url
-        final Uri.Builder builder = Uri.parse("http://" + BuildConfig.A2A_SERVER_DOMAIN + "/api/v1/a2a/proposal").buildUpon();
+        final Uri.Builder builder;
+        if(serverDomain != null){
+            builder = Uri.parse("http://" + serverDomain + "/api/v1/a2a/proposal").buildUpon();
+        }else{
+            builder = Uri.parse("http://" + BuildConfig.A2A_SERVER_DOMAIN + "/api/v1/a2a/proposal").buildUpon();
+        }
+        Log.e(LOG_TAG,"url = "+builder.toString());
         // call http
         new Thread(() -> {
             try{

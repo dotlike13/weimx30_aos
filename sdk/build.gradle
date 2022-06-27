@@ -28,7 +28,7 @@ android {
     productFlavors {
         dev {
             dimension = 'WalletSDK'
-            buildConfigField "String", "A2A_SERVER_DOMAIN", "\"wma2a.metadium.com\""
+            buildConfigField "String", "A2A_SERVER_DOMAIN", "\"a2a.test.wemix.com\""
         }
         prod {
             dimension = 'WalletSDK'

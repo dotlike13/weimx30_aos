@@ -129,7 +129,13 @@ AndroidManifest.xml 파일에 호출하는 앱 package명를 추가해야 합니
         <package android:name="com.wemixfoundation.wemixwallet" />
     </queries>
  ```
-
+## Optional
+AndroidManifest.xml 파일에서 api서버주소를 설정 할수 있습니다.
+설정하지 않는 경우 기본값으로 설정이 됩니다.
+```xml
+      <meta-data android:name="A2A_SERVER_DOMAIN"
+                android:value="a2a.test.wemix.com" />
+ ```
 ## Author
 
 bslee, bslee@coinplug.com
