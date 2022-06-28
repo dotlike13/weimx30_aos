@@ -13,38 +13,13 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+        buildConfigField "String", "A2A_SERVER_DOMAIN", "\"https://a2a.wemix.com\""
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-
-
-
-    flavorDimensions 'WalletSDK'
-    productFlavors {
-        dev {
-            dimension = 'WalletSDK'
-            buildConfigField "String", "A2A_SERVER_DOMAIN", "\"a2a.test.wemix.com\""
-        }
-        prod {
-            dimension = 'WalletSDK'
-            buildConfigField "String", "A2A_SERVER_DOMAIN", "\"wma2a.metadium.com\""
-        }
-
-
-    }
-
-    sourceSets {
-        dev {
-            res.srcDirs = ['src/dev/res']
-        }
-
-        prod {
-            res.srcDirs = ['src/prod/res']
         }
     }
     compileOptions {

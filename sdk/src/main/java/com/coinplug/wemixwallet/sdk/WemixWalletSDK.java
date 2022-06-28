@@ -200,9 +200,9 @@ public class WemixWalletSDK{
         // make launch url
         final Uri.Builder builder;
         if(serverDomain != null){
-            builder = Uri.parse("http://" + serverDomain + "/api/v1/a2a/proposal").buildUpon();
+            builder = Uri.parse(serverDomain + "/api/v1/a2a/proposal").buildUpon();
         }else{
-            builder = Uri.parse("http://" + BuildConfig.A2A_SERVER_DOMAIN + "/api/v1/a2a/proposal").buildUpon();
+            builder = Uri.parse(BuildConfig.A2A_SERVER_DOMAIN + "/api/v1/a2a/proposal").buildUpon();
         }
         Log.e(LOG_TAG,"url = "+builder.toString());
         // call http
