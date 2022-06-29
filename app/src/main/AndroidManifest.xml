@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.coinplug.wemixwalletsdk">
+    package="com.wemixfoundation.wemixwalletsdk">
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -12,7 +12,7 @@
         <meta-data android:name="A2A_SERVER_DOMAIN"
             android:value="http://a2a.test.wemix.com" />
         <activity
-            android:name=".MainActivity"
+            android:name="com.wemixfoundation.wemixwalletsdk.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
