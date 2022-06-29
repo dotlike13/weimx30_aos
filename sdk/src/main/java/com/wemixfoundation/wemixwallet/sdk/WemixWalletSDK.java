@@ -259,7 +259,7 @@ public class WemixWalletSDK{
                 }
             }catch(MalformedURLException e){
                 // Never happened
-                Logger.debug("IOException");
+                Logger.debug("MalformedURLException");
             }catch(IOException e){
                 Logger.debug("IOException");
                 onRequestFailed(-1);

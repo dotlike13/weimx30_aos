@@ -10,7 +10,7 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.WemixWalletSDK">
         <meta-data android:name="A2A_SERVER_DOMAIN"
-            android:value="http://a2a.test.wemix.com" />
+            android:value="https://a2a.test.wemix.com" />
         <activity
             android:name="com.wemixfoundation.wemixwalletsdk.MainActivity"
             android:exported="true">
