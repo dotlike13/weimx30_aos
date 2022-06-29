@@ -273,8 +273,12 @@ public class WemixWalletSDK{
 
     private void getProposalResponseA2A(String requestId, ResponseResultHandler responseResultHandler){
         // make launch url
-        final Uri.Builder builder = Uri.parse("http://" + BuildConfig.A2A_SERVER_DOMAIN + "/api/v1/a2a/result").buildUpon()
-                .appendQueryParameter("requestId", requestId);
+        final Uri.Builder builder;
+        if(serverDomain != null){
+            builder = Uri.parse(serverDomain + "/api/v1/a2a/result").buildUpon().appendQueryParameter("requestId", requestId);;
+        }else{
+            builder = Uri.parse(BuildConfig.A2A_SERVER_DOMAIN + "/api/v1/a2a/result").buildUpon().appendQueryParameter("requestId", requestId);;
+        }
         // call http
         new Thread(() -> {
             try{
