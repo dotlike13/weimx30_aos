@@ -59,3 +59,16 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.8.7'//gson
 }
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = "com.coinplug.wemixwallet"
+                artifactId = "walletSDK"
+                version = '0.8.0'
+            }
+        }
+    }
+}
