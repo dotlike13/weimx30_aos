@@ -9,10 +9,8 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.WemixWalletSDK">
-<!--
         <meta-data android:name="A2A_SERVER_DOMAIN"
             android:value="http://a2a.test.wemix.com" />
--->
         <activity
             android:name=".MainActivity"
             android:exported="true">
