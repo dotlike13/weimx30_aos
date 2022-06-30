@@ -13,7 +13,7 @@ Add the following to your build.gradle file:
 
 ```gradle
     dependencies {
-        implementation 'com.github.wemixarchive:wemix-wallet-sdk-android'
+        implementation 'com.github.wemixarchive:wemix-wallet-sdk-android:0.8.0'
     }
 ```
 
